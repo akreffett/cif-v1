@@ -13,6 +13,7 @@ sub parse {
     my @array;
     foreach(@lines){
         next if(/^(#|<|$)/);
+        s/$f->{'regex_match'}/qq{"$f->{'regex_replace'}"}/ee if ($f->{'regex_match'} && $f->{'regex_replace'});
         my @m = ($_ =~ /$f->{'regex'}/);
         next unless(@m);
         my $h;
