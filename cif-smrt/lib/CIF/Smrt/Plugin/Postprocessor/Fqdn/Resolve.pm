@@ -21,6 +21,7 @@ sub process {
     
     foreach my $i (@{$data->get_Incident()}){
         next unless($i->get_EventData());
+        my $source = $i->get_IncidentID()->get_name() || 'unknown';
         my $restriction = $i->get_restriction();
         
         my $assessment = $i->get_Assessment();
@@ -82,37 +83,39 @@ sub process {
                                         meaning     => 'rdata',
                                         content     => $thing,
                                 }));                     
-                                my $id = IncidentIDType->new({
-                                    content     => generate_uuid_random(),
-                                    instance    => $smrt->get_instance(),
-                                    name        => 'activedns',
-                                    restriction => $restriction,
-                                });
-                                my $new = Iodef::Pb::Simple->new({
-                                    description     => $description,
-                                    address         => $thing,
-                                    IncidentID      => $id,
-                                    assessment      => $impact->get_content()->get_content(),
-                                    confidence      => $confidence,
-                                    RelatedActivity => RelatedActivityType->new({
-                                        IncidentID  => [ $i->get_IncidentID() ],
+                                unless($source =~ /(active|passive)dns/) {
+                                    my $id = IncidentIDType->new({
+                                        content     => generate_uuid_random(),
+                                        instance    => $smrt->get_instance(),
+                                        name        => 'activedns',
                                         restriction => $restriction,
-                                    }),
-                                    restriction     => $restriction,
-                                    guid            => $guid,
-                                    portlist        => $portlist,
-                                    ip_protocol     => $protocol,
-                                    AlternativeID   => $i->get_AlternativeID(),
-                                });
-                                # block against CDN's that might thrash us into a for-loop of darkness
-                                if($confidence > 15){
-                                    foreach (@postprocessors){
-                                        my $ret = $_->process($smrt,$new);
-                                        push(@new_incidents,@$ret) if($ret);
+                                    });
+                                    my $new = Iodef::Pb::Simple->new({
+                                        description     => $addr->get_content().' IN '.$rr->type().' '.$thing,
+                                        address         => $thing,
+                                        IncidentID      => $id,
+                                        assessment      => $impact->get_content()->get_content(),
+                                        confidence      => $confidence,
+                                        RelatedActivity => RelatedActivityType->new({
+                                            IncidentID  => [ $i->get_IncidentID() ],
+                                            restriction => $restriction,
+                                        }),
+                                        restriction     => $restriction,
+                                        guid            => $guid,
+                                        portlist        => $portlist,
+                                        ip_protocol     => $protocol,
+                                        AlternativeID   => $i->get_AlternativeID(),
+                                    });
+                                    # block against CDN's that might thrash us into a for-loop of darkness
+                                    if($confidence > 15){
+                                        foreach (@postprocessors){
+                                            my $ret = $_->process($smrt,$new);
+                                            push(@new_incidents,@$ret) if($ret);
+                                        }
                                     }
+                                    push(@new_incidents,@{$new->get_Incident()});
+                                    push(@$altids,$id);
                                 }
-                                push(@new_incidents,@{$new->get_Incident()});
-                                push(@$altids,$id);
                             }
                         }
                     }

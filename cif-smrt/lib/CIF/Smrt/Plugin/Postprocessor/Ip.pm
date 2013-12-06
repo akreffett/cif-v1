@@ -48,4 +48,18 @@ sub is_ipv6 {
     return 1 if($addr->get_category() == AddressType::AddressCategory::Address_category_ipv6_net_mask());
 }
 
+sub resolve_ptr {
+    my $class = shift;
+    my $addr = shift;
+            
+    my $r = Net::DNS::Resolver->new(recursive => 0);
+    $r->udp_timeout(2);
+    $r->tcp_timeout(2);
+                            
+    my $pkt = $r->send($addr, 'PTR');
+    return unless($pkt);
+    my @rdata = $pkt->answer();
+    return(\@rdata);
+}
+
 1;

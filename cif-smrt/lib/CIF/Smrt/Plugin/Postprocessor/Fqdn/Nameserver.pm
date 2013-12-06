@@ -72,8 +72,8 @@ sub process {
                                 my $new = Iodef::Pb::Simple->new({
                                     address         => $rr->nsdname(),
                                     IncidentID      => $id,
-                                    assessment      => $impact->get_content->get_content(),
-                                    description     => 'nameserver',
+                                    assessment      => 'nameserver',
+                                    description     => $addr->get_content().' IN NS '.$rr->nsdname(),
                                     confidence      => $confidence,
                                     RelatedActivity => RelatedActivityType->new({
                                         IncidentID  => [ $i->get_IncidentID() ],
