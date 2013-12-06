@@ -53,7 +53,7 @@ sub process {
                                 my $id = IncidentIDType->new({
                                     content     => generate_uuid_random(),
                                     instance    => $smrt->get_instance(),
-                                    name        => $smrt->get_name(),
+                                    name        => 'spamhaus.org',
                                     restriction => $restriction,
                                 });
                                 my $new = Iodef::Pb::Simple->new({

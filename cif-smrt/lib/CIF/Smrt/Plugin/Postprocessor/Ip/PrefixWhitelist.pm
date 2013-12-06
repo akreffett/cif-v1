@@ -40,7 +40,7 @@ sub process {
             my $new_id = IncidentIDType->new({
                 content     => generate_uuid_random(),
                 instance    => $smrt->get_instance(),
-                name        => $smrt->get_name(),
+                name        => $i->get_IncidentID()->get_name(),
                 restriction => $restriction,
             });
             my $new = Iodef::Pb::Simple->new({
