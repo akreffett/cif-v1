@@ -1,5 +1,5 @@
 SUBDIRS = libcif libcif-dbi cif-router cif-smrt
-EXTRA_DIST = sbin
+EXTRA_DIST = sbin scripts
 
 ME=cif-v1
 BUILD=$(shell git describe --tags)

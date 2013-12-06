@@ -1,0 +1,5 @@
+The scripts included in this directory are example scripts that may be
+modified and installed in the correct locations to configure
+Apache httpd and PostgreSQL server for use with CIF.
+
+See https://code.google.com/p/collective-intelligence-framework/wiki/ServerInstall_v1
